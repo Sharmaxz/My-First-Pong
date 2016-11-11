@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+
+<html>
+
+        <head> 
+
+                <title> Pong </title>  <!Titulo que aparece na guia>
+                
+        </head>
+
+
+        <body background="lbhTsKY.jpg" style="background-repeat: no-repeat" ><!Imagem do fundo e o estilo dele é de não se repetir>
+                
+                
+                <center> <!Tudo que vai ficar no centro>
+
+                <marquee direction="right"><h1><font color="purple">Shadow</font></marquee>  <!Animação da palavra "Shadow">
+                <font SIZE=5 COLOR="White">Pong</font>  
+                <BR> 
+                <canvas WIDTH="800" HEIGHT="600" id="main" STYLE="BORDER:1px SOLID #FFFFFF"></canvas> <!Quadrado do jogo, Width = largura, Height = Altura>
+				
+                
+
+				
+				
+                       <script> 
+				
+				/*window.onload = function() 
+			{ 
+			var main_canvas = document.getElementById("main"),
+				c = main_canvas.getContext("2d");
+				
+			c.fillStyle = "black";
+			c.fillRect(0, 0, main_canvas.width, main_canvas.height);
+			
+			c.arc(200, 340, 50, 0, 7, false);
+			c.fill();
+			
+			var posX = 0
+			    posY = 200;
+			setInterval(function()
+			{
+			
+			posX += 5;
+			
+			if( posX > 400){
+				posY += 5;
+				posX= 400
+				 
+				
+			}
+			c.fillStyle = "rgba(0,0,0,0.0)";
+			c.fillRect(0,0, main_canvas.width, main_canvas.height);
+			
+			c.fillStyle = "white";
+			c.beginPath();
+			c.arc(posX, posY, 50, 0, 7, false);
+			c.fill();
+			
+			}, 30);
+			
+			
+			}; */
+                                                                
+				var main_canvas = document.getElementById("main"); 
+				var main_screen = main_canvas.getContext("2d"); //"2d" obrigatório  
+				
+				
+				//logo a baixo tenho algumas "var" que significa variaveis, logo elas variam
+
+				var paleta_vermelha_imagem = new Image();
+
+				var paleta_vermelha_carregada = false;
+				var paleta_vermelha_posicao_x = 340;
+				var paleta_vermelha_posicao_y = 0;
+				var paleta_vermelha_tamanho_W = 120;
+				var paleta_vermelha_tamanho_H = 40;
+				var paleta_vermelha_velocidade_X = 10; //velocidade a qual irá a bola para direta/esquerda
+				var paleta_vermelha_velocidade_Y = 10; 
+				var paleta_vermelha_pontos = 0; //pontuação a ser desenhada
+				var paleta_vermelha_moveR = false;
+				var paleta_vermelha_moveL = false;
+				var paleta_vermelha_win = false; //dizendo que a paleta vermelha ainda não ganhou
+				
+				var paleta_azul_imagem = new Image();  
+
+				var paleta_azul_carregada = false;
+				var paleta_azul_posicao_x = 340;
+				var paleta_azul_posicao_y = 560;
+				var paleta_azul_tamanho_W = 120;
+				var paleta_azul_tamanho_H = 40;
+				var paleta_azul_velocidade_X = 10;
+				var paleta_azul_velocidade_Y = 10;  
+				var paleta_azul_pontos = 0; //pontuação a ser desenhada
+				var paleta_azul_moveR = false;
+				var paleta_azul_moveL = false;
+				var paleta_azul_win = false;
+				
+				var bola_imagem = new Image();
+
+				var bola_carregada = false;
+				var bola_posicao_x = 400;
+				var bola_posicao_y = 300;
+				var bola_tamanho_W = 20;
+				var bola_tamanho_H = 20;
+				var bola_velocidade_X = random_velocity(2, 6); //velocidade randomizada
+				var bola_velocidade_Y = random_velocity(2, 8);
+				
+				
+				var TimerParaHit = 10; //O tempo vai demorar para acontecer mais uma nova repulsão/colisão na paleta
+				
+				var bola_audio = new Audio();
+				
+				var bola_audio_carregada = false;
+				
+				
+				var velLimite = 20;
+				var velDelta = 1;
+				
+				var paused = false; //true;
+				var pressionado = false; //false;
+				
+				var game_state ="intro";
+				var time_to_menu = 0;
+			
+				var selection_imagem = new Image(); //Seletor do menu
+				var selection_posicao_Y = 250;
+				var selection_1orX = true;
+				var selection_imagem_carregada = false;
+				
+				var selection2_imagem = new Image();
+				var selection2_posicao_Y = 250;
+				var selection2_orX = true;
+				var selection2_imagem_carregada = false;
+	
+				var intro_imagem = new Image(); //Intro
+				var intro_imagem_carregada = false;
+
+				var menu_imagem = new Image();
+				var menu_imagem_carregada = false;
+				
+				
+				Load();
+				
+					window.addEventListener('keydown', key_down, true); 
+					window.addEventListener('keyup', key_up, true);
+					//window.addEventListener('mousemove', mouse_move, true);  //Adiciona um evento
+							//responsável por atualizar a lógica do jogo
+							
+					
+					
+					
+					function Load() //Função de carregar
+					{          
+							//console.log("Shadow Load() funciona");
+													
+						menu_imagem.src="menu.png"; 
+						menu_imagem.onload = function() 
+										{menu_imagem_carregada = true
+										console.log("menu_imagem_carregada");}; //responsavel por carregar a imagem
+
+						selection_imagem.src="bola.png";
+						selection_imagem.onload =	function()
+										{selection_imagem_carregada = true
+										console.log("selection_imagem_carregada");};
+										
+						selection2_imagem.src="bola.png";
+						selection2_imagem.onload =	function()
+										{selection_imagem_carregada = true
+										console.log("selection_imagem_carregada");};
+
+						intro_imagem.src="fundo.png";
+						intro_imagem.onload =	function() 
+										{ intro_imagem_carregada = true};			
+						
+						paleta_vermelha_imagem.src="paleta vermelha.png";
+						paleta_vermelha_imagem.onload = function()
+						          {paleta_vermelha_carregada = true;
+				                   console.log("paleta_vermelha_carregada"); };
+												     
+						paleta_azul_imagem.src="paleta azul.png";
+						paleta_azul_imagem.onload = function()
+						          {paleta_azul_carregada = true; 
+				                   console.log("paleta_azul_carregada"); };
+
+						bola_imagem.src="bola.png";
+						bola_imagem.onload = function()
+						          {bola_carregada = true;
+				                   console.log("bola_carregada"); };
+						
+						bola_audio.src="beep.wav";
+						bola_audio.load = function()
+									{bola_audio_carregada = true;
+										console.log("bola_audio_carregada"); };
+												
+							console.log("load"); 
+													
+													
+							if(menu_imagem_carregada !=true &&
+							   selection_imagem_carregada !=true &&
+							   intro_imagem_carregada !=true &&
+							   paleta_vermelha_carregada != true&&
+							   paleta_azul_carregada != true &&
+							   bola_carregada!= true &&
+							   bola_audio_carregada != true) //Se todas as paletas forem carregadas, o jogo será carregado, assim entrando no loop
+							{
+								Loop(); //Loop... loop e.e
+								//setTimeout(Load, 30);
+
+							}
+						
+							else
+							{
+								setTimeout(Load, 30);  
+								//Loop();
+							} 
+						
+					}		
+						
+						
+						
+						 function Update() //Função que é responsavel por atualizar o jogo 
+						{
+							 //console.log("Shadow Update() funciona");
+							 
+							 if(TimerParaHit > 0) //Caso o timer seja maior que 0, ele irá diminuir 1
+									{
+										TimerParaHit -= 1;
+									}
+							 
+							 
+							switch(game_state) 
+							{
+										case "intro": 
+										time_to_menu += 1;
+
+											if(time_to_menu > 90)
+												game_state = "menu";
+												
+											break;
+										//caso da intro, isso é um estado do jogo, ele é o primeiro estado.
+										
+										
+										case "menu":
+									
+											if(selection_1orX)
+											{
+										
+												if(selection_posicao_Y > 250)
+													selection_posicao_Y -= 10;
+											}
+						
+											if(!selection_1orX)
+											{
+										
+												if(selection_posicao_Y < 325)
+													selection_posicao_Y += 10;
+											}
+												break;
+												
+										//Estado do jogo/tela, onde irá só funcionar a parte de seleção de todo o codigo	
+									
+						
+								case "game":
+
+								if(!paused && !paleta_azul_win && !paleta_vermelha_win) //O jogo só vai funcionar(roda) quando o pause/paletaAzulWin/PaletaVermelha/Win forem verdadeiro
+								{
+						
+						
+									//movimentação da bola
+										bola_posicao_x += bola_velocidade_X;
+										bola_posicao_y += bola_velocidade_Y;
+							
+							
+									// responsavel pela repulsão/colisão:
+									
+										if(Repulsion(paleta_vermelha_posicao_x,
+														paleta_vermelha_posicao_y,
+														paleta_vermelha_tamanho_W,
+														paleta_vermelha_tamanho_H,
+														bola_posicao_x,
+														bola_posicao_y,
+														bola_tamanho_W,
+														bola_tamanho_H))
+										{
+											if(TimerParaHit <= 0) //Quando o time for 0 ou menos que isso, a paleta vai poder repulsar a bola
+											{
+												bola_velocidade_Y *= -1;
+												bola_velocidade_X = random_velocity(1,10);  
+												
+											}
+												
+												bola_audio.play()
+												TimerParaHit = 10;
+										
+													if(bola_velocidade_Y > 0 &&
+														bola_velocidade_Y < velLimite)
+														bola_velocidade_Y += velDelta;
+											
+													else if(bola_velocidade_Y < 0 &&
+														bola_velocidade_Y > -velLimite)
+														bola_velocidade_Y -= velDelta;
+									
+									
+											
+										}
+							
+										else if(Repulsion(paleta_azul_posicao_x,
+																	paleta_azul_posicao_y,
+																	paleta_azul_tamanho_W,
+																	paleta_azul_tamanho_H,
+																	bola_posicao_x,
+																	bola_posicao_y,
+																	bola_tamanho_W,
+																	bola_tamanho_H))
+										{
+											if(TimerParaHit <= 0)
+											{
+									
+												bola_velocidade_Y *= -1;
+												bola_velocidade_X = random_velocity(1,10);
+												
+													
+													/*if(bola_posicao_x > paleta_azul_posicao_x + 60)
+													{
+														bola_velocidade_Y *= -1;
+													}
+													
+													else if(bola_posicao_x < paleta_azul_posicao_x + 60)
+													{
+														bola_velocidade_Y *= 1;
+														
+													}*/
+										
+											}
+											
+
+												TimerParaHit = 10;
+												bola_audio.play();
+											
+													if(bola_velocidade_Y > 0 &&
+														bola_velocidade_Y < velLimite)
+														bola_velocidade_Y += velDelta;
+											
+													else if(bola_velocidade_Y < 0 &&
+														bola_velocidade_Y > -velLimite)
+														bola_velocidade_Y -= velDelta;
+												
+										}
+										
+											
+										
+										
+										//Reponsavel por chamar a função
+										
+											MakePoints();
+											KeepBallInField();
+											Selection();
+											KeepPaletteInField();
+											
+								
+								}
+							}			
+						}			
+						
+							function Selection() //Seleção..
+							{
+									if(selection_1orX)//Se essa opção for selecionada a inteligencia artificial vai ser chamada, com isso fazendo coom que o movimento da paleta vermelha tbm será 
+									{
+										IA();
+										
+										if(paleta_vermelha_moveR)
+										{
+											paleta_vermelha_posicao_x += paleta_vermelha_velocidade_X;
+										}
+	
+										if(paleta_vermelha_moveL)
+										{
+											paleta_vermelha_posicao_x -= paleta_vermelha_velocidade_X;
+										}
+										
+										
+									}
+
+									else if(!selection_1orX)//Se não for a primeira opção vai chamar a função "WithoutLocking"
+									{
+										WithoutLocking();
+										console.log("lol")
+							
+									}
+							
+							
+							}
+						
+							function Reset() //Quando pressionar o botão  "R", o jogo irá reiniciar
+							{
+										paleta_vermelha_posicao_x = 340;
+										paleta_vermelha_posicao_y = 0;
+										paleta_azul_posicao_x = 340;
+										paleta_azul_posicao_y = 560;
+										bola_posicao_x = 400;
+										bola_posicao_y = 300;
+										paused = false;
+										paleta_vermelha_pontos = 0;
+										paleta_azul_pontos = 0;
+										bola_velocidade_X = random_velocity(2, 6);
+										bola_velocidade_Y = random_velocity(6, 8);
+										paleta_vermelha_win = false;
+										paleta_azul_win = false;
+										
+									
+
+							}
+							
+							function random_velocity(min, max)//responsavel pela randomização
+							{				
+								var random = Math.random();
+
+									if(Math.random() > 0.5)
+									{
+										return Math.floor((random*(max - min)) + min);
+									}
+
+										else
+									{
+										return -Math.floor((random*(max - min)) + min);
+									}
+							}
+							
+							function IA(dificuldade)//Inteligencia Artificial
+							{
+						
+								if(bola_posicao_x + bola_tamanho_W > paleta_azul_posicao_x + paleta_azul_tamanho_W)
+								{
+									paleta_azul_posicao_x += paleta_azul_velocidade_X -3.5
+								}
+				
+									else if(bola_posicao_x < paleta_azul_posicao_x )
+									{
+										paleta_azul_posicao_x -= paleta_azul_velocidade_X -3.5
+									}
+
+							}
+					
+							function KeepBallInField()//Responsavel por manter a bola no campo
+							{
+								if(bola_posicao_x >= 800 - 20 || bola_posicao_x <= 0)
+								{
+									//simplesmente "*=1" multiplicando -1 ao valor da velocidade X da bola(5), ele irá ficar -5, assim fazendo com que a bola vá para o sentindo oposto
+									bola_velocidade_X *= -1;
+									bola_audio.play();
+									
+								}
+							
+								if(bola_posicao_y >= 600 - 20 || bola_posicao_y <= 0 )
+								{
+									//simplesmente "*= -1" multiplicando -1 ao valor da velocidade Y da bola(5), ele irá ficar -5, assim fazendo com que a bola vá para o sentido oposto
+									bola_velocidade_Y *= -1; 
+									TimerParaHit = 10;
+									bola_audio.play();
+									
+										if(bola_velocidade_Y > 0 &&
+											bola_velocidade_Y < velLimite)
+											bola_velocidade_Y += velDelta;
+											
+										else if(bola_velocidade_Y < 0 &&
+											bola_velocidade_Y > -velLimite)
+											bola_velocidade_Y -= velDelta;
+								}			
+							}
+							
+							function KeepPaletteInField()//Reponsavel por manter a paleta no campo 
+							{
+								if(paleta_vermelha_posicao_x < 0)
+								{
+									//limitando até onde a paleta vermelha pode ir(para esquerda)
+									paleta_vermelha_posicao_x = 0;
+								}	
+								
+								else if( paleta_vermelha_posicao_x > 680) //Esse else if, é meio confuso, pq até agora não entendi, mas é algo tipo "Se não, se..."
+								{
+									//limitando até onde a paleta vermelha pode ir(para direita)
+									paleta_vermelha_posicao_x = 680;
+									//paleta_vermelha_posicao_x  -=0,000001
+								}
+								
+								if(paleta_azul_posicao_x < 0)
+								{
+									paleta_azul_posicao_x = 0
+								}
+								
+								else if(paleta_azul_posicao_x > 680)
+								{
+									paleta_azul_posicao_x = 680
+								}
+							}
+							
+							function Repulsion(object1_x,
+												object1_y,
+												object1_W,
+												object1_H,
+												object2_x,
+												object2_y,
+												object2_W,
+												object2_H)
+												
+							{	
+								if( (object1_x + object1_W < object2_x) || 
+									(object1_x > object2_x + object2_W) || 
+									(object1_y + object1_H < object2_y) ||
+									(object1_y > object2_y + object2_H) )
+								{
+										return false;
+										
+								
+								}
+								
+								else
+								{
+										return true;
+								}
+								
+							}//Responsavel pela colisão do jogo
+							
+							
+							function MakePoints()//Essa parte é qual os pontos são marcados e o que mostra o jogador que ganhou
+							{
+							
+								if(bola_posicao_y >= 600 - 20)
+								{
+									paleta_vermelha_pontos += 1; //"+=1" Significa que irá acrescentar +1 ao valor de pontos.
+								}
+								
+								if(bola_posicao_y <= 0)
+								{
+									paleta_azul_pontos += 1; //"+=1" Significa que irá acrescentar +1 ao valor de pontos.
+								}
+
+								if(paleta_vermelha_pontos == 10)
+								{
+									paused = true;
+									paleta_vermelho_win = true;
+									paleta_vermelha_posicao_x = 340;
+									paleta_vermelha_posicao_y = 0;
+									paleta_azul_posicao_x = 340;
+									paleta_azul_posicao_y = 560;
+									bola_posicao_x = 400;
+									bola_posicao_y = 300;
+								}
+
+								if(paleta_azul_pontos == 10)//Se a paleta azul ganhar o jogo é pausado, as paletas e a bola vão voltar para o seu ponto inicial
+								{
+									paused = true;
+									paleta_azul_win = true;
+									paleta_vermelha_posicao_x = 340;
+									paleta_vermelha_posicao_y = 0;
+									paleta_azul_posicao_x = 340;
+									paleta_azul_posicao_y = 560;
+									bola_posicao_x = 400;
+									bola_posicao_y = 300;
+								}
+
+								
+							}
+						
+							/*function mouse_move(mouse) //Função que com certeza deve ser para mover a paleta a partir do mouse.
+							{
+								//console.log("mouse x " + mouse.x);
+								//console.log("mouse y " + mouse.y);
+								//console.log("mouse offset x  " + mouse.offsetX);
+								//console.log("mouse offset y " + mouse.offsetY); 
+								
+								
+								paleta_vermelha_posicao_x = mouse.x - main_canvas.offsetLeft - 60; 
+								//paleta_vermelha_posicao_y = mouse.y - main_canvas.offsetLeft - 60;
+								
+							}*/
+							
+							function key_down(key)//Quando uma tecla for pressionada
+							{
+								console.log(key.keyCode);
+								
+								switch (key.keyCode)
+								{
+										case 80:
+											//console.log(Math.random());
+
+												//Math.random();
+												//Math.floor((Math.random*10)+1);
+												//Math.floor(1)
+
+									if(!pressionado)
+									{
+											paused = !paused;
+											pressionado = true;
+											
+											
+									}
+									
+										
+										break;
+					
+									case 68:
+										paleta_vermelha_moveR = true;
+										//Movimento da paleta vermelha para direita quando for prssionado o botão 68(que é "D")
+					
+								break;
+				
+									case 65:
+										paleta_vermelha_moveL = true;
+										//Movimento da paleta vermelha para esquerda quando for prssionado o botão 68(que é "A")
+					
+								break;
+
+									case 39:
+										paleta_azul_moveR = true;
+										//Movimento da paleta azul para esquerda quando for prssionado o botão 68(que é "seta >")
+				
+								break;
+
+									case 37:
+										paleta_azul_moveL = true;
+										//Movimento da paleta azul para esquerda quando for prssionado o botão 68(que é "seta <")
+					
+								break;
+
+									case 82:
+										Reset();
+										//Se apertar o botão 82("R") vai resetar o jogo
+
+								break;
+								
+									case 83:
+										if(game_state == "menu")
+											selection_1orX = !selection_1orX;
+											
+											if(game_state == "paused")
+											selection2_orX = !selection2_orX;
+											
+								break;
+								
+									case 87:
+										if(game_state == "menu")
+											selection_1orX = !selection_1orX;
+											
+										if(game_state == "paused")
+											selection2_orX = !selection2_orX;
+											
+									break;
+
+									case 77:
+										game_state = "menu";
+										Reset();
+						
+								break;
+
+
+									case 38:
+										if(game_state == "menu")
+											selection_1orX = !selection_1orX;
+						
+								break;
+
+									case 40:
+										if(game_state == "menu")
+											selection_1orX = !selection_1orX;
+							
+								break;
+
+									case 13:
+										if(game_state == "menu")
+											game_state = "game"
+											paused = false;
+									
+									break;
+								}	
+								
+							}		
+							
+							function key_up(key)//Quando a tecla for solta
+							{
+							
+							
+								switch (key.keyCode)
+								{
+									case 80:
+										//paused = !paused;
+										pressionado = false;
+									
+										break;
+					
+									case 68: 
+										paleta_vermelha_moveR = false;
+										
+										break;
+					
+									case 65:
+										paleta_vermelha_moveL = false;
+										
+										break;
+
+									case 39:
+										paleta_azul_moveR = false;
+										
+										break;
+
+									case 37:
+										paleta_azul_moveL = false;
+										
+										break;
+								
+								}
+							} 
+							
+							function WithoutLocking()//O que faz com que a paleta tenha um movimento mais suave
+							{
+								
+								if(paleta_vermelha_moveR)
+								{
+									paleta_vermelha_posicao_x += paleta_vermelha_velocidade_X;
+								}
+	
+								if(paleta_vermelha_moveL)
+								{
+									paleta_vermelha_posicao_x -= paleta_vermelha_velocidade_X;
+								}
+
+								if(paleta_azul_moveR)
+								{
+									paleta_azul_posicao_x += paleta_azul_velocidade_X;
+								}			
+								
+								
+								if(paleta_azul_moveL)
+								{		
+									paleta_azul_posicao_x -= paleta_azul_velocidade_X;
+								}
+							
+							
+							}
+							
+
+							
+							function clear() //Irá apagar os rastros da paleta
+							{
+								main_screen.clearRect(0,0,800,600); 
+							}
+							
+							function Draw() //Responsavel por desenhar as coisas na tela
+							{
+								clear();
+							
+								//console.log("Shadow Draw() funciona");
+
+
+											switch(game_state)
+											{
+												case "intro":
+													main_screen.drawImage(intro_imagem, 0, 0);
+													//Responsavel por desenhar a intro quando tiver no estado da intro
+													break;
+						
+												case "menu":		
+													main_screen.drawImage(menu_imagem, 0, 0);
+													main_screen.drawImage(selection_imagem, 200, selection_posicao_Y);
+													
+												
+													main_screen.font = "50px Comic Sans MS";//Negrito, italico, sublinhado?
+													main_screen.fillStyle ="#FF00FF"; //Estilo de cor que irá ser aplicada
+													main_screen.fillText("Singplayer", 230, 280); //Desenha a pontuação da paleta vermelha
+													
+													main_screen.font = "50px Comic Sans MS";//Negrito, italico, sublinhado?
+													main_screen.fillStyle ="#FF10FF"; //Estilo de cor que irá ser aplicada
+													main_screen.fillText("Multiplayer", 230, 360); //Desenha a pontuação da paleta vermelha
+
+													
+													main_screen.font = "25px Comic Sans MS";//Negrito, italico, sublinhado?
+													main_screen.fillStyle ="#FF10FF"; //Estilo de cor que irá ser aplicada
+													main_screen.fillText("Press R to Restart", 230, 425); //Desenha a pontuação da paleta vermelha
+													main_screen.fillText("Press P to Pause", 230, 450);	
+													main_screen.fillText("Press M to Menu", 230, 475);
+
+													
+													main_screen.font = "15px Comic Sans MS"; //Negrito, italico, sublinhado?
+													main_screen.fillStyle ="#FFFFFF"; //Estilo de cor que irá ser aplicada
+													main_screen.fillText("©2015 Shadow Von Wolfkin", 600, 590); //Desenha a pontuação da paleta vermelha
+													main_screen.fillText("v1.0", 15, 590);
+													
+													//Responsavel por desenhar o menu quando tiver no estado do menu
+													
+													break;	
+													
+													case "game":
+													
+													
+													
+													main_screen.drawImage(intro_imagem, 0, 0);
+											
+													main_screen.drawImage(paleta_vermelha_imagem, 
+																				paleta_vermelha_posicao_x, 
+																				paleta_vermelha_posicao_y); 
+												  
+													main_screen.drawImage(paleta_azul_imagem, 
+																				paleta_azul_posicao_x, 
+																				paleta_azul_posicao_y); 
+												  
+													main_screen.drawImage(bola_imagem, 
+																					bola_posicao_x, 
+																					bola_posicao_y); 
+												  
+												 
+									 	
+													main_screen.font = "20px Comic Sans MS"; //Negrito, italico, sublinhado?
+													main_screen.fillStyle ="#FFFFFF"; //Estilo de cor que irá ser aplicada
+													main_screen.fillText(paleta_vermelha_pontos, 20,60); //Desenha a pontuação da paleta vermelha
+													main_screen.fillText(paleta_azul_pontos, 20,600-40); //Desenha a pontuação da paleta azul
+											
+												if(paleta_azul_pontos == 10)
+												{
+												
+													main_screen.font = "100px Comic Sans MS";
+													main_screen.fillStyle ="#00F";
+													main_screen.fillText("Blue Victory", 130, 250);
+												}
+
+												if(paleta_vermelha_pontos == 10)
+												{
+													main_screen.font = "100px Comic Sans MS";
+													main_screen.fillStyle ="#F00";
+													main_screen.fillText("Red Victory", 140, 250);
+												}
+											
+												if(paused && !paleta_azul_win && !paleta_vermelha_win)
+												{
+														main_screen.font = "100px Comic Sans MS";
+														main_screen.fillStyle ="#FF10FF";
+														main_screen.fillText("PAUSED", 205, 250);
+													
+												}
+											
+												break; //O que é responsavel por fazer com que o Loop não leia novamente
+													
+										}				
+								}		
+						
+						
+							function Loop() //Loop....
+							{
+								//console.log("loop");									
+																	
+								Update();
+
+								Draw();
+		
+								// a função loop se repetirá em 30ms
+								setTimeout(Loop, 30);
+							}
+							
+
+						
+						// if = yiff -q
+                        
+
+                      </script>
+					  
+					  
+                </center>
+				
+				
+         </body>
+		 
+		 
+</html>

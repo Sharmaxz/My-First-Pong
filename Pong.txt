@@ -1,0 +1,468 @@
+<html>
+	<head>
+		<title> Pong </title>
+	</head>
+	
+	<body>
+		<body bgcolor="korchid">
+		<center>
+		<marquee direction="right"> FUT PONG </marquee>
+		<br>
+
+		<canvas WIDTH="800" HEIGHT="600" ID="main" STYLE="BORDER:10PX SOLID #CCFF33">
+
+		<script>
+			
+			var main_canvas = document.getElementById("main");
+			var main_screen = main_canvas.getContext("2d");
+
+			var bola_futebol_imagem = new Image();
+		
+		//document.createElement('img')
+
+			var bola_futebol_carregada = false;
+			var bola_futebol_posicao_X = 400;
+			var bola_futebol_posicao_Y = 300;
+			var bola_futebol_tamanho_W = 35;
+			var bola_futebol_tamanho_H = 35;
+			var bola_futebol_velocidade_X = random_velocity();
+			var bola_futebol_velocidade_Y = random_velocity();
+
+
+			var main_canvas = document.getElementById("main");
+			var main_screen = main_canvas.getContext("2d");
+
+			var paleta_flamengo_imagem = new Image();
+		
+		//document.createElement('img')
+
+			var paleta_flamengo_carregada = false;
+			var paleta_flamengo_posicao_X = 360;
+			var paleta_flamengo_posicao_Y = 560;
+			var paleta_flamengo_tamanho_W = 120;
+			var paleta_flamengo_tamanho_H = 40;
+			var paleta_flamengo_velocidade_X = 5;
+			var paleta_flamengo_velocidade_Y = 5;
+			var paleta_flamengo_pontos = 0;
+			var paleta_flamengo_move_direita = false;
+			var paleta_flamengo_move_esquerda = false;
+
+			var main_canvas = document.getElementById("main");
+			var main_screen = main_canvas.getContext("2d");
+
+			var paleta_vasco_imagem = new Image();
+		
+		//document.createElement('img')
+
+			var paleta_vasco_carregada = false;
+			var paleta_vasco_posicao_X = 360;
+			var paleta_vasco_posicao_Y = 0;
+			var paleta_vasco_tamanho_W = 120;
+			var paleta_vasco_tamanho_H = 40;
+			var paleta_vasco_velocidade_X = 5;
+			var paleta_vasco_velocidade_Y = 5;
+			var paleta_vasco_pontos = 0;
+			var paleta_vasco_move_direita = false;
+			var paleta_vasco_move_esquerda = false;
+
+			var back_ground_imagem = new Image();
+
+		//document.createElement('img')
+
+			var back_ground_carregada = false;
+			var back_ground_posicao_X = 0;
+			var back_ground_posicao_Y = 0;
+			var back_ground_tamanho_W = 800;
+			var back_ground_tamanho_H = 600;
+
+			var velocidade_limite = 20;
+			var velocidade_delta = 1;
+
+			var bola_futebol_som = new Audio();
+
+			var paused = true;
+			var pressionado = false;
+
+			
+			
+			
+			Load();
+
+			window.addEventListener('keydown', key_down, true);
+			window.addEventListener('keyup', key_up, true);
+
+			function Load()
+			{
+				//console.log("load");
+
+				paleta_vasco_imagem.src="PaletaVasco.png";
+				paleta_vasco_imagem.onload =
+				function() { paleta_vasco_carregada = true; console.log("paleta_vasco_carregada"); };
+
+				paleta_flamengo_imagem.src="PaletaFlamengo.png";
+				paleta_flamengo_imagem.onload =
+				function() { paleta_flamengo_carregada = true; console.log("paleta_flamengo_carregada"); };
+
+				bola_futebol_imagem.src="BolaFut.png";
+				bola_futebol_imagem.onload =
+				function() { bola_futebol_carregada = true; console.log("bola_futebol_carregada"); };
+
+				back_ground_imagem.src="BackGround.png";
+				back_ground_imagem.onload =
+				function() { back_ground_carregada = true; console.log("back_ground_carregada"); };
+
+				bola_futebol_som.src="SomBola.wav";
+				bola_futebol_som.load();
+	
+				if (paleta_flamengo_carregada == false ||
+					paleta_vasco_carregada == false ||
+					bola_futebol_carregada == false)
+				{
+					Loop();
+					//setTimeout(Load,30);
+				}
+				
+				else
+				{
+					setTimeout(Load,30);
+					//Loop();
+				}
+
+				
+							
+			}
+
+			function Update()               
+			{
+				//console.log("update");
+
+				//iniciar o jogo
+
+				if(!paused)
+				{
+
+					if(paleta_vasco_posicao_X < 0)
+					{
+						paleta_vasco_posicao_X = 0;
+					}
+				
+					else if(paleta_vasco_posicao_X > 680)
+					{
+						paleta_vasco_posicao_X = 680
+					}
+
+					if(paleta_flamengo_posicao_X < 0)
+					{
+						paleta_flamengo_posicao_X = 0;
+					}
+				
+					else if(paleta_flamengo_posicao_X > 680)
+					{
+						paleta_flamengo_posicao_X = 680
+					}
+		
+					bola_futebol_posicao_X += bola_futebol_velocidade_X
+					bola_futebol_posicao_Y += bola_futebol_velocidade_Y
+
+					//manter bola no campo
+
+					if(bola_futebol_posicao_Y > 560 || bola_futebol_posicao_Y < 0)
+					{
+						bola_futebol_velocidade_Y *= -1
+						bola_futebol_som.play();
+
+
+						if(bola_futebol_velocidade_Y > 0 && bola_futebol_velocidade_Y < velocidade_limite)
+							
+							bola_futebol_velocidade_Y += velocidade_delta
+							
+				
+						else if(bola_futebol_velocidade_Y < 0 && bola_futebol_velocidade_Y > -velocidade_limite)
+							
+							bola_futebol_velocidade_Y -= velocidade_delta
+					}
+				
+
+					if(bola_futebol_posicao_X > 760 || bola_futebol_posicao_X < 0)
+					{
+						bola_futebol_velocidade_X *= -1
+						bola_futebol_som.play();
+
+					}
+				
+				
+				
+					//pontos do jogo
+
+					if(bola_futebol_posicao_Y < 0)
+					{
+						paleta_flamengo_pontos += 1
+
+					}
+				
+					if(bola_futebol_posicao_Y > 560)
+					{
+						paleta_vasco_pontos += 1
+
+					}
+
+					//bola bater na paleta
+				
+					if(collision(bola_futebol_posicao_X, bola_futebol_posicao_Y, bola_futebol_tamanho_W, bola_futebol_tamanho_H,
+							paleta_vasco_posicao_X, paleta_vasco_posicao_Y, paleta_vasco_tamanho_W, paleta_vasco_tamanho_H))
+					{
+						bola_futebol_velocidade_Y *= -1;
+						bola_futebol_som.play();
+
+
+						if(bola_futebol_velocidade_Y > 0 && bola_futebol_velocidade_Y < velocidade_limite)
+							
+							bola_futebol_velocidade_Y += velocidade_delta
+							
+				
+						else if(bola_futebol_velocidade_Y < 0 && bola_futebol_velocidade_Y > -velocidade_limite)
+							
+							bola_futebol_velocidade_Y -= velocidade_delta
+				
+					}
+
+					else if(collision(bola_futebol_posicao_X, bola_futebol_posicao_Y, bola_futebol_tamanho_W, bola_futebol_tamanho_H,
+						paleta_flamengo_posicao_X, paleta_flamengo_posicao_Y, paleta_flamengo_tamanho_W, paleta_flamengo_tamanho_H))
+					{
+						bola_futebol_velocidade_Y *= -1;
+						bola_futebol_som.play();
+
+	
+						if(bola_futebol_velocidade_Y > 0 && bola_futebol_velocidade_Y < velocidade_limite)
+							
+							bola_futebol_velocidade_Y += velocidade_delta
+							
+				
+						else if(bola_futebol_velocidade_Y < 0 && bola_futebol_velocidade_Y > -velocidade_limite)
+							
+							bola_futebol_velocidade_Y -= velocidade_delta
+					}
+
+					//movimentar paleta sem travar
+
+					if(paleta_vasco_move_direita)
+					{
+						paleta_vasco_posicao_X += paleta_vasco_velocidade_X;
+					}
+
+					if(paleta_vasco_move_esquerda)
+					{
+						paleta_vasco_posicao_X -= paleta_vasco_velocidade_X;
+					}
+
+					if(paleta_flamengo_move_direita)
+					{
+						paleta_flamengo_posicao_X += paleta_flamengo_velocidade_X;
+					}
+
+					if(paleta_flamengo_move_esquerda)
+					{		
+						paleta_flamengo_posicao_X -= paleta_flamengo_velocidade_X;
+					}
+
+				}
+			}
+
+			function collision(objeto1_X, objeto1_Y, objeto1_W, objeto1_H,
+						objeto2_X, objeto2_Y, objeto2_W, objeto2_H)
+			{
+				if ((objeto1_X + objeto1_W < objeto2_X) ||
+					(objeto1_X > objeto2_X + objeto2_W) ||
+					(objeto1_Y + objeto1_H < objeto2_Y) ||
+					(objeto1_Y > objeto2_Y + objeto2_H))
+				{
+					return false;
+				}
+
+				else
+				{
+					return true;
+				}
+
+				
+			}
+
+			function random_velocity()
+			{
+				var random = Math.random();
+
+				if(Math.random() > 0.5)
+				{
+					return Math.floor((random*5) + 1);
+				}
+
+				else
+				{
+					return -Math.floor((random*5) + 1);
+				}
+			}
+
+			function key_down(key)
+			{
+				console.log(key.keyCode);
+				
+				/*if(key.keyCode == 80 && !pressionado)
+				{
+					paused = !paused;
+					pressionado = true;
+				}
+
+				if(key.keyCode == 39)
+				{
+					paleta_vasco_move_direita = true;
+				}
+
+				if(key.keyCode == 37)
+				{
+					paleta_vasco_move_esquerda = true;
+				}
+		
+				if(key.keyCode == 68)
+				{
+					paleta_flamengo_move_direita = true;
+				}
+
+				if(key.keyCode == 65)
+				{
+					paleta_flamengo_move_esquerda = true;
+				}*/
+				
+
+				switch (key.keyCode)
+				{
+				
+				case 80:
+					console.log(Math.random());
+
+					//Math.random();
+					//Math.floor((Math.random*10)+1);
+					//Math.floor(1)
+
+					if(!pressionado)
+					{
+						paused = !paused;
+						pressionado = true;
+					}
+					break;
+					
+				case 39:
+					paleta_vasco_move_direita = true;
+					break;
+				
+				case 37:
+					paleta_vasco_move_esquerda = true;
+					break;
+
+				case 68:
+					paleta_flamengo_move_direita = true;
+					break;
+
+				case 65:
+					paleta_flamengo_move_esquerda = true;
+					break;
+				}
+			}
+
+			function key_up(key)
+			{
+				/*if(key.keyCode == 80)
+				{
+					pressionado = false;
+				}
+				
+			
+				if(key.keyCode == 39)
+				{
+					paleta_vasco_move_direita = false;
+				}
+
+				if(key.keyCode == 37)
+				{
+					paleta_vasco_move_esquerda = false;
+				}
+
+				if(key.keyCode == 68)
+				{
+					paleta_flamengo_move_direita = false;
+				}
+
+				if(key.keyCode == 65)
+				{
+					paleta_flamengo_move_esquerda = false;
+				}*/
+
+				switch (key.keyCode)
+				{
+				
+				case 80:
+					pressionado = false;
+					break;
+					
+				case 39:
+					paleta_vasco_move_direita = false;
+					break;
+				
+				case 37:
+					paleta_vasco_move_esquerda = false;
+					break;
+
+				case 68:
+					paleta_flamengo_move_direita = false;
+					break;
+
+				case 65:
+					paleta_flamengo_move_esquerda = false;
+					break;
+				}
+			}
+
+			
+			function clear()
+			{
+				main_screen.clearRect(0,0,800,600);
+
+			}
+
+			function Draw()
+			{
+				clear();
+
+				//console.log("draw");
+			
+				main_screen.drawImage(back_ground_imagem, back_ground_posicao_X, back_ground_posicao_Y);
+
+				main_screen.drawImage(paleta_vasco_imagem, paleta_vasco_posicao_X, paleta_vasco_posicao_Y);
+			
+				main_screen.drawImage(paleta_flamengo_imagem, paleta_flamengo_posicao_X, paleta_flamengo_posicao_Y);
+				
+				main_screen.drawImage(bola_futebol_imagem, bola_futebol_posicao_X, bola_futebol_posicao_Y);
+
+				main_screen.font = "20px Comic Sans MS";
+				main_screen.fillStyle = "#FFFF00";
+				main_screen.fillText(paleta_vasco_pontos, 20, 60);
+				main_screen.fillText(paleta_flamengo_pontos, 20,560);
+
+				main_screen.fillText("Vasco", 730, 60);
+				main_screen.fillText("Flamengo", 700, 560);
+				main_screen.fillText("VS", 750, 310);
+			}
+
+			function Loop()
+			{
+				//console.log("loop")
+
+				Update();
+
+				Draw();
+
+				setTimeout(Loop, 30);
+			}
+
+		</script>
+	</body>
+</html>
